@@ -47,19 +47,29 @@ class TwoLayerNet(object):
         ###################################################
         #TODO: Feedforward                                #
         ###################################################
+        # print("X - ", X.shape)
+        outL1=self.layer1.feedforward(X)
+        # print("outL1 - ", outL1.shape)
+        outL2=self.layer2.feedforward(outL1)
+        # print("outL2 - ", outL2.shape)
+        # print(outL2[:5])
+    
+        loss, dw= softmax_loss(outL2, y)
 
-        
+        # self.predictions=yp
         ###################################################
         #TODO: Backpropogation, here is just one dense    #
         #layer, it should be pretty easy                  #
         ###################################################
-        
-        
+        # print("dw-", dw.shape)
+        bp1=self.layer2.backward(dw)
+        bp2=self.layer1.backward(bp1)
+
         ###################################################
         #              END OF YOUR CODE                   #
         ###################################################
         # Add L2 regularization
-        square_weights = np.sum(layer1.params[0]**2) + np.sum(layer2.params[0]**2)
+        square_weights = np.sum(self.layer1.params[0]**2) + np.sum(self.layer2.params[0]**2)
         loss += 0.5*self.reg*square_weights
         return loss
 
@@ -80,7 +90,12 @@ class TwoLayerNet(object):
         #variables in layer1 and layer2                   #
         ###################################################
 
-        
+        for i in range(len(params)):
+
+            params[i]=params[i]-learning_rate*grads[i]
+        # w = w - learning_rate * gradient
+
+
         ###################################################
         #              END OF YOUR CODE                   #
         ###################################################
@@ -104,9 +119,17 @@ class TwoLayerNet(object):
         layer1, layer2 = self.layer1, self.layer2
         #######################################################
         #TODO: Remember to use functions in class SoftmaxLayer#
-        #######################################################
+        ################### ####################################
 
-        
+        outL1=layer1.feedforward(X)
+        outL2=layer2.feedforward(outL1)
+        predictions = np.argmax(outL2, axis=1)
+
+
+
+        # predictions=np.argmax(self.outP,axis=1)
+        # print("pred shp-", predictions.shape)
+
         #######################################################
         #                 END OF YOUR CODE                    #
         #######################################################

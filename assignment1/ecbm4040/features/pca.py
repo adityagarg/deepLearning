@@ -17,6 +17,23 @@ def pca_naive(X, K):
     - T: (float) A numpy vector of length K, showing the score of each
          component vector
     """
+    N=X.shape[0]
+    cov=(X.T.dot(X))/N
+
+    eVals, eVects=np.linalg.eig(cov)
+
+    topK=np.argsort(eVals)[::-1][:K]
+
+
+    T=eVals[topK]
+    P=eVects[:, topK].T
+    # P=X.T.dot(V)
+
+    # print(eVects==eVects.T)
+    # print("eVals-", eVals.shape)
+    # print(eVals[:10])
+    # print("eVects-", eVects.shape)
+
 
     ###############################################
     #TODO: Implement PCA by extracting eigenvector#
@@ -26,5 +43,5 @@ def pca_naive(X, K):
     ###############################################
     #              End of your code               #
     ###############################################
-    
+    # return None
     return (P, T)

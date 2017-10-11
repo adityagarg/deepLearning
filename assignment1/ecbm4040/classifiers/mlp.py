@@ -50,17 +50,26 @@ class MLP(object):
         ###################################################
         #TODO: Feedforward                                #
         ###################################################
+        out=X
+        for layer in layers:
+            out=layer.feedforward(out)
 
+        loss, dw= softmax_loss(out, y)
         
         ###################################################
         #TODO: Backpropogation                            #
         ###################################################
-        
+        grad=dw
+        for layer in reversed(layers):
+            grad=layer.backward(grad)
         
         ###################################################
         # TODO: Add L2 regularization                     #
         ###################################################
-        
+        square_weights=0
+        for layer in layers:
+            square_weights+=np.sum(layer.params[0]**2)
+        loss+=0.5*reg*square_weights
         
         ###################################################
         #              END OF YOUR CODE                   #
@@ -77,11 +86,35 @@ class MLP(object):
         #variables in layers                              #
         ###################################################
 
+
+        ###My code
+        num_layers=self.num_layers
+        # layer1, layer2 = self.layer1, self.layer2
+        layers=self.layers
+
+        # params = layer1.params + layer2.params
+        params=[params for layer in layers for params in layer.params ]
+        # print(params[:2])
+        # grads = layer1.gradients + layer2.gradients
+        # grads=[layer.gradients for layer in layers]
+        grads=[grads for layer in layers for grads in layer.gradients ]
+        # print(grads[:2])
+        # Add L2 regularization
+        reg = self.reg
+        grads = [np.reshape(grad, (-1, grad.shape[-1])) + reg*params[i] for i, grad in enumerate(grads)]
+    
+        for i in range(len(params)):
+
+            params[i]=params[i]-learning_rate*grads[i]
+
+        ###
         
         ###################################################
         #              END OF YOUR CODE                   #
         ###################################################
    
+
+
         # update parameters in layers
         for i in range(num_layers):
             self.layers[i].update_layer(params[2*i:2*(i+1)])
@@ -104,7 +137,11 @@ class MLP(object):
         #TODO: Remember to use functions in class SoftmaxLayer#
         #######################################################
 
+        out=X
+        for layer in layers:
+            out=layer.feedforward(out)
         
+        predictions = np.argmax(out, axis=1)
         #######################################################
         #                 END OF YOUR CODE                    #
         #######################################################

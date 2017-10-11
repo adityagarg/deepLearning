@@ -31,6 +31,13 @@ def softmax_loss_naive(W, X, y, reg):
     # here, it is easy to run into numeric instability. Don't forget the        #
     # regularization!                                                           #
     #############################################################################
+    num_classes = W.shape[1]
+    num_train = X.shape[0]
+
+    # for i in num_train:
+
+    #   for j in num_classes:
+
 
     
     #############################################################################
@@ -61,32 +68,32 @@ def softmax_loss_vectorized(W, X, y, reg):
     # print("X-",X.shape)
     # print("y-",y.shape)
     # print("W-",W.shape)
+
     
     num_classes = W.shape[1]
     num_train = X.shape[0]
     
-    loss = 0.0
-    dW = np.zeros_like(W)
-
-    wx=np.dot(X, W)
-    # print("wx-",wx.shape)
-    
-    wx_exp=np.exp(wx)
-    smx=wx_exp/np.sum(wx_exp, axis=1)[:,None]
-    # print("smx-",smx.shape)
-    
-    smx_yi=smx[range(num_train),y]
-    
-    smxLoss=np.sum(-np.log(smx_yi))/num_train
+  
+    x=np.dot(X, W)
+    probs = np.exp(x - np.max(x, axis=1, keepdims=True))
+    probs /= np.sum(probs, axis=1, keepdims=True)
+    print(probs.shape)
+    loss = -np.sum(np.log(probs[range(num_train), y])) / num_train
     regLoss=0.5*reg*np.sum(W*W)
-    
-    loss=smxLoss+regLoss
+    loss+=regLoss
 
-    dw=smx_yi*(1-smx_yi)
-#     dw+=reg*W 
+  
+    probs[range(num_train), y] -= 1
+    dW=X.T.dot(probs)
+    dW /= num_train
+    dW+=reg*W
+
+
+
+
     
     #############################################################################
     #                          END OF YOUR CODE                                 #
     #############################################################################
-
     return loss, dW
+

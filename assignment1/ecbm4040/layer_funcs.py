@@ -22,8 +22,15 @@ def affine_forward(x, w, b):
     # TODO: Implement the affine forward pass. Store the result in out. You   #
     # will need to reshape the input into rows.                               #
     ###########################################################################
+    # print("input x shape-", x.shape)
+    N=x.shape[0]
+    D=np.prod(x.shape[1:])
+    xNew=np.reshape(x, (N,D))
+    # print("Xnew-", xNew.shape)
 
-    
+
+    out=np.dot(xNew, w)+b
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -50,6 +57,17 @@ def affine_backward(dout, x, w, b):
     # TODO: Implement the affine backward pass.                               #
     ###########################################################################
 
+    N=x.shape[0]
+    D=np.prod(x.shape[1:])
+
+    dx=dout.dot(w.T)
+    # print("dx-", dx.shape)
+
+    dw=(x.T).dot(dout)
+    # print("dout-", dout.shape)
+    
+    db = np.sum(dout.T, axis=1)
+
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -70,7 +88,7 @@ def relu_forward(x):
     ###########################################################################
     # TODO: Implement the ReLU forward pass.                                  #
     ###########################################################################
-
+    out=np.maximum(0,x)
     
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -91,6 +109,9 @@ def relu_backward(dout, x):
     ###########################################################################
     # TODO: Implement the ReLU backward pass.                                 #
     ###########################################################################
+    dx=np.array(dout)
+    dx[x<=0]=0
+    # print(dx.shape)
 
 
     ###########################################################################
@@ -119,9 +140,22 @@ def softmax_loss(x, y):
     # TODO: You can use the previous softmax loss function here.                #
     #############################################################################
 
+    num_train = x.shape[0]
     
+  
+    probs = np.exp(x - np.max(x, axis=1, keepdims=True))
+    probs /= np.sum(probs, axis=1, keepdims=True)
+    # print(probs.shape)
+    loss = -np.sum(np.log(probs[range(num_train), y])) / num_train
+
+    dW=probs.copy()
+    dW[range(num_train), y] -= 1
+    # dW=x.T.dot(probs)
+    dW /= num_train
+
+
     #############################################################################
     #                          END OF YOUR CODE                                 #
     #############################################################################
 
-    return loss, dx
+    return loss, dW
