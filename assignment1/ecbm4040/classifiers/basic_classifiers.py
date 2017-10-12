@@ -56,6 +56,12 @@ class BasicClassifier(object):
             # Hint: Use np.random.choice to generate indices. Sometimes, random     #
             # choice will be better than training in order.                         #
             #########################################################################
+            randInd=np.random.choice(num_train, batch_size)
+            X_batch=X[randInd, :]
+            Y_batch=y[randInd]
+            # print(X_batch.shape)
+            loss, dW= svm_loss_vectorized(self.W, X_batch, Y_batch, reg)
+            loss_history.append(loss)
 
             
             #########################################################################
@@ -63,7 +69,8 @@ class BasicClassifier(object):
             # Update the weights using the gradient and the learning rate.          #
             #########################################################################
 
-            
+            self.W=self.W-learning_rate*dW
+
             #########################################################################
             #                       END OF YOUR CODE                                #
             #########################################################################
@@ -91,6 +98,9 @@ class BasicClassifier(object):
         # TODO:                                                                   #
         # Implement this method. Store the predicted labels in y_pred.            #
         ###########################################################################
+
+        y_pred=np.argmax(X.dot(self.W), axis=1)
+        # print("ypred", y_pred.shape)
 
 
         ###########################################################################

@@ -70,7 +70,7 @@ def svm_loss_vectorized(W, X, y, reg):
     margin=np.maximum(0, 1 + scores- correct_class_score.T[:, np.newaxis])
     margin[range(num_train), y] = 0
     loss=(np.sum(margin))/num_train
-    loss+=0.5*reg*np.sum(W*W)
+    loss+=reg*np.sum(W*W)
 
 
     
@@ -83,9 +83,13 @@ def svm_loss_vectorized(W, X, y, reg):
     # to reuse some of the intermediate values that you used to compute the     #
     # loss.                                                                     #
     #############################################################################
+    indicator = margin
+    indicator[indicator > 0] = 1
+    indicator[range(num_train), y] = -np.sum(indicator, axis=1).T
+    dW = X.T.dot(indicator)
+    dW /= num_train
+    dW += 2*reg*W
 
-    dW=dW
-    # dW[range(num_train), y]=dW[range(num_train), y]-X[]
 
     #############################################################################
     #                             END OF YOUR CODE                              #
