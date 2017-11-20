@@ -43,7 +43,15 @@ class MyLSTMCell(RNNCell):
         #############################################
         #           TODO: YOUR CODE HERE            #
         #############################################
-        raise NotImplementedError('Please edit this function.')
+
+        self.num_units=int(num_units)
+        self.num_proj=int(num_proj)
+        self.forget_bias=forget_bias
+        self.activation=activation
+
+
+
+        # raise NotImplementedError('Please edit this function.')
 
     # The following 2 properties are required when defining a TensorFlow RNNCell.
     @property
@@ -58,7 +66,10 @@ class MyLSTMCell(RNNCell):
         #############################################
         #           TODO: YOUR CODE HERE            #
         #############################################
-        raise NotImplementedError('Please edit this function.')
+
+        return self.num_units + self.num_proj
+
+        # raise NotImplementedError('Please edit this function.')
 
     @property
     def output_size(self):
@@ -70,7 +81,10 @@ class MyLSTMCell(RNNCell):
         #############################################
         #           TODO: YOUR CODE HERE            #
         #############################################
-        raise NotImplementedError('Please edit this function.')
+
+        return self.num_proj
+
+        # raise NotImplementedError('Please edit this function.')
 
     def call(self, inputs, state):
         """
