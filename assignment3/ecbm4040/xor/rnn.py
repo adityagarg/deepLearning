@@ -47,8 +47,23 @@ class MyLSTMCell(RNNCell):
         self.num_units=int(num_units)
         self.num_proj=int(num_proj)
         self.forget_bias=forget_bias
-        self.activation=activation
+        
 
+        if activation is None:
+            self.activation = tf.tanh
+        else:
+            self.activation=activation
+
+        xav_init = tf.contrib.layers.xavier_initializer
+
+        self.W = tf.get_variable('W', shape=[4, 1, self.num_units], initializer=xav_init())
+
+        self.WFinal=tf.get_variable('WFinal', shape=[self.num_units, num_proj], initializer=xav_init())
+
+        self.U = tf.get_variable('U', shape=[4, 2, self.num_units], initializer=xav_init())
+
+
+    
 
 
         # raise NotImplementedError('Please edit this function.')
@@ -106,4 +121,58 @@ class MyLSTMCell(RNNCell):
         #############################################
         #           TODO: YOUR CODE HERE            #
         #############################################
-        raise NotImplementedError('Please edit this function.')
+
+
+        num_units=self.num_units
+        num_proj=self.num_proj
+
+        # print(state.get_shape())
+
+
+        c=tf.slice(state, [0, 0], [-1, num_units])
+        h=tf.slice(state, [0, num_units], [-1, num_proj])
+
+        # print(c.get_shape())
+
+
+        U=self.U
+        W=self.W
+        WFinal=self.WFinal
+        # print(self.num_units)
+        # print(state.get_shape())
+
+        # print(type(inputs))
+        # print("inputs", inputs.get_shape())
+        # print("W", W[0].get_shape())
+        # print("h", h.get_shape())
+        # print("U", U[0].get_shape())
+        
+        # c,h = tf.unstack(state)
+        ####
+        # GATES
+        #
+        #  input gate
+        i = tf.sigmoid(tf.matmul(inputs,W[0]) + tf.matmul(h,U[0]))
+        #  forget gate
+        f = tf.sigmoid(tf.matmul(inputs,W[1]) + tf.matmul(h,U[1]) + self.forget_bias)
+        #  output gate
+        o = tf.sigmoid(tf.matmul(inputs,W[2]) + tf.matmul(h,U[2]))
+        # gate weights - candidate valuesU    
+        g = tf.tanh(tf.matmul(inputs,W[3]) + tf.matmul(h,U[3]))
+        ###
+        # new internal cell state
+
+        c = c*f + g*i
+
+        # print(c.get_shape())
+        # output state
+        h = tf.matmul(self.activation(c)*o, WFinal)
+
+        # print(h.get_shape())
+
+        state_final=tf.concat([c, h], 1)
+
+        # return tf.stack([h, c])
+        return (h,state_final)
+
+        # raise NotImplementedError('Please edit this function.')
